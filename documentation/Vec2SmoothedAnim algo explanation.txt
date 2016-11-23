@@ -1,0 +1,58 @@
+== Quadratic motion smoothing ==
+
+Here I explain the technique used in our `Vec2SmoothedAnim.qml` component for smoothing motion.
+
+We want `state` to smoothly chase `targetState` as `targetState` changes.
+For this reason we want `targetState` to pull `state` toward itself in an
+elastic-like fashion - the farther they are from each other, the stronger
+the pull. But there are at least one difference
+between real-world elastic pulling and our pulling:
+the `state` doesn't have an inertia (or a mass). This means
+that
+- when it needs to
+  begin moving, it instantly gets a high velocity, without smoothly
+  accelerating to that velocity.
+- when the `targetState` moves,
+  the `state` changes movement direction instantly
+- there is no "overshoot" (see [2]).
+  The velocity comes smoothly to zero as the distance comes to zero.
+
+Note: A smoothing technique often used for similar purposes is
+      Exponential Smoothing (see [1]), in which the distance is simply multiplied by
+      a constant `alpha` < 1.0 on every frame. I tried this method but found that
+      when the two values become pretty close, the remaining length
+      takes too long a time to go through (even if we decide to stop movement at
+      a threshold distance of approx. 1px).
+
+I've devised a technique using the quadratic formula `x^2` that works similarly
+to Exponential Smoothing but without the mentioned drawback.
+The idea is to imitate Qt's (and popular outside Qt) easing function `Easing.OutQuad`
+(see [3]), but in such a way that it supports chasing a moving target.
+
+The algorithm, in understandable pseudocode, is this:
+    
+    1. declare constant `decelerationCoef`
+    2. var `dist` = get the remaining distance to travel
+    3. see where on the `x^2` graph (for x>=0) the function has the value `dist`
+    4. go `decelerationCoef` units to the left of the place you found
+    5. var `newDist` = see what value the `x^2` function has at the place you went to.
+    6. move `state` in the direction of `targetState` a distance such that the new
+       distance between the two is equal to `newDist`.
+
+An elaboration on some of these steps:
+
+    Step 3: To do this, we can use the inverse function of `x^2`, which is `x^(1/2)`
+    Step 5: To do this, we simply plug the value into the `x^2` formula
+    
+Illustration: see `documentation/resources/quadratic_motion_smoothing.png`.
+    
+Try iterating this algorithm with a stationary `targetState` and you'll see that `state` approaches it in exactly the same way as Qt's `Easing.OutQuad` easing does.
+
+And what happens when the target moves? Well, next time we hit the smoothing algorithm, we'll simply find that we're not at the place on the graph where we were last frame, and we'll begin from the new place (which, of course, may mean that the velocity may suddenly become lower or higher than before).
+
+Note: An important advantage of this Quadratic Smoothing Algorithm is that we actually reach our target, unlike Exponential Smoothing, which gets arbitrarily close to the target, but never actually reaches it. This means we don't need to stop when we reach an arbitrary threshold distance such as 1px.
+
+References:
+[1] https://en.wikipedia.org/wiki/Exponential_smoothing#Basic_exponential_smoothing
+[2] https://en.wikipedia.org/wiki/Overshoot_(signal)
+[3] http://doc.qt.io/qt-5/qml-qtquick-animator.html#easing.type-prop
