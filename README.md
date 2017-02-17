@@ -5,4 +5,4 @@ This currently contains only one QML component - `Vec2SmoothedAnim`.
 See the `src/` dir for the source (pretty well commented) and the `documentation` dir for explanation of the algorithm.
 
 Acknowledgements:  
-This was developed as part of my work on the [Stremio](http://www.strem.io/) project. I have gotten permission to open-source it.
+_Brought to you by [Stremio](http://www.strem.io/)_
