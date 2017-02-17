@@ -1,0 +1,2 @@
+module utils
+singleton GlslUtils 1.0 GlslUtils.qml
