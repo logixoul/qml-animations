@@ -1,8 +1,6 @@
 # qml-animations
-Some animation functionality not provided by Qt Quick.
 
-This currently contains only one QML component - `Vec2SmoothedAnim`.
-See the `src/` dir for the source (pretty well commented) and the `documentation` dir for explanation of the algorithm.
+Some functionality not provided by Qt Quick or provided in a worse way.
 
 Acknowledgements:  
 _Brought to you by [Stremio](http://www.strem.io/)_
