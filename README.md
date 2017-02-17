@@ -1,4 +1,4 @@
-# qml-animations
+# qml-extras
 
 Some functionality not provided by Qt Quick or provided in a worse way.
 
